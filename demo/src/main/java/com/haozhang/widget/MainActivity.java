@@ -10,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.haozhang.lib.SlantedTextView;
+//import com.haozhang.lib.SlantedTextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        SlantedTextView stv = (SlantedTextView) findViewById(R.id.test);
+//        SlantedTextView stv = (SlantedTextView) findViewById(R.id.test);
 
 //        stv.setText("PHP")
 //                .setTextColor(Color.WHITE)

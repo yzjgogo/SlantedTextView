@@ -15,7 +15,10 @@ import android.os.Build;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+
+import java.util.Arrays;
 
 /**
  * @author HaoZhang
@@ -144,6 +147,7 @@ public class SlantedTextView extends View {
     }
 
     private Path getModeRightPath(Path path, int w, int h) {
+        path.moveTo(0,0);
         path.lineTo(w, h);
         path.lineTo(w, h - mSlantedLength);
         path.lineTo(mSlantedLength, 0);
@@ -193,6 +197,11 @@ public class SlantedTextView extends View {
     private void drawText(Canvas canvas) {
         int w = (int) (canvas.getWidth() - mSlantedLength / 2);
         int h = (int) (canvas.getHeight() - mSlantedLength / 2);
+        Log.e("yin","canvas.getWidth():"+canvas.getWidth()+
+                ",canvas.getHeight()："+canvas.getHeight()+
+                ",mSlantedLength:"+mSlantedLength+
+                ",w:"+w+
+                ",h:"+h);
         float[] xy = calculateXY(canvas,w, h);
         float toX = xy[0];
         float toY = xy[1];
@@ -213,16 +222,21 @@ public class SlantedTextView extends View {
         switch (mMode) {
             case MODE_LEFT_TRIANGLE:
             case MODE_LEFT:
-                rect = new Rect(0, 0, w, h);
+                rect = new Rect(0, 0, w, h);//这个矩形的中心就是边长为mSlantedLength的斜体的中心位置
                 rectF = new RectF(rect);
-                rectF.right = mTextPaint.measureText(mSlantedText, 0, mSlantedText.length());
-                rectF.bottom = mTextPaint.descent() - mTextPaint.ascent();
+                rectF.right = mTextPaint.measureText(mSlantedText, 0, mSlantedText.length());//mSlantedText的宽
+                rectF.bottom = mTextPaint.descent() - mTextPaint.ascent();//descent线的y坐标减去ascent的y坐标，正数；mSlantedText的宽的长
+                //上面两行代码决定了包裹mSlantedText的最小矩形的长宽(0,0,rectF.right,rectF.bottom)
                 rectF.left += (rect.width() - rectF.right) / 2.0f;
                 rectF.top += (rect.height() - rectF.bottom) / 2.0f;
-                xy[0] = rectF.left;
+                //上面两行代码决定了包裹mSlantedText的最小矩形是rectF,并且rectF在矩形rect的中间位置，之后canvas一旋转文字的中心仍然是边长为mSlantedLength的斜体的中心位置
+//                Log.e("yin","第二矩形宽again："+rectF.width()+",高："+rectF.height()+",left:"+rectF.left+",top:"+rectF.top+",right:"+rectF.right+",bottom:"+rectF.bottom);
+                xy[0] = rectF.left;//画文字的起始位置
                 xy[1] = rectF.top - mTextPaint.ascent();
+                //画文字的基线位置：mTextPaint.ascent() = ascent线的y坐标 - baseline线的y坐标；因此xy[1] = rectF.top+baseLine线的y坐标，即基线下移top的距离
                 xy[2] = w / 2;
                 xy[3] = h / 2;
+                //(xy[2],xy[3])就是边长为mSlantedLength的斜体的中心位置，canvas沿着该中心旋转后mSlantedText就是斜的
                 xy[4] = -ROTATE_ANGLE;
                 break;
             case MODE_RIGHT_TRIANGLE:
